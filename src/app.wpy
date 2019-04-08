@@ -34,12 +34,15 @@ page{
 
 <script>
 import wepy from 'wepy'
+import 'wepy-async-function'
+import api from '@/utils/api'
 
 export default class extends wepy.app {
   config = {
     pages: [
       'pages/index',
-      'pages/user'
+      'pages/user',
+      'pages/auth/login'
     ],
     window: {
       backgroundTextStyle: 'light',
