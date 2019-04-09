@@ -65,7 +65,94 @@ const login = async (params = {}) => {
   return authResponse
 }
 
+// 刷新 token
+
+const refreshToken = async (accessToken) => {
+  // 请求刷新接口
+  let refreshResponse = await wepy.request({
+    url: host + '/' + 'authorizations/current',
+    method: 'PUT',
+    header: {
+      'Authorization': 'Bearer' + accessToken
+    }
+  })
+
+    // 刷新成功状态码 200
+  if (refreshResponse.statusCode === 200) {
+      // 将token 及过期时间保存在storage中
+    wepy.setStorageSync('access_token', refreshResponse.data.access_token)
+    wepy.setStorageSync('access_token_expired_at', new Date().getTime() + refreshResponse.data.expires_in * 1000)
+  }
+  return refreshResponse
+}
+
+// 获取token
+const getToken = async (options) => {
+    // 从缓存中取出token
+  let accessToken = wepy.getStorageSync('access_token')
+  let expiredAt = wepy.getStorageSync('access_token_expired_at')
+
+    // 如果token过期了，则调用刷新方法
+  if (accessToken && new Date().getTime() > expiredAt) {
+    let refreshResponse = await refreshToken(accessToken)
+
+        // 刷新成功
+    if (refreshResponse.statusCode === 200) {
+      accessToken = refreshResponse.data.access_token
+    } else {
+            // 刷新失败了，重新调用登录方法，设置token
+      let authResponse = await login()
+      if (authResponse.statusCode === 201) {
+        accessToken = authResponse.data.access_token
+      }
+    }
+  }
+  return accessToken
+}
+
+// 带身份认证的请求
+const authRequest = async (options, showLoading = true) => {
+  if (typeof options === 'string') {
+    options = {
+      url: options
+    }
+  }
+    // 获取token
+  let accessToken = await getToken()
+
+     // 将token 设置在 header 中
+  let header = options.header || {}
+  header.Authorization = 'Bearer' + accessToken
+  options.header = header
+
+  return request(options, showLoading)
+}
+
+ //   退出登录
+const logout = async (params = {}) => {
+  let accessToken = wepy.getStorageSync('access_token')
+
+    // 调用删除token 接口，让token失效
+  let logoutResponse = await wepy.request({
+    url: host + '/' + 'authorizations/current',
+    method: 'DELETE',
+    header: {
+      'Authorization': 'Bearer' + accessToken
+    }
+  })
+
+    // 调用接口成功则清空缓存
+  if (logoutResponse.statusCode === 204) {
+    wepy.clearStorage
+  }
+
+  return logoutResponse
+}
+
 export default {
   request,
-  login
+  authRequest,
+  refreshToken,
+  login,
+  logout
 }
