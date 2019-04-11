@@ -1,4 +1,16 @@
 <style lang="less">
+  .avatar {
+      width: 80px;
+      height: 80px;
+      display: block;
+      border-radius: 50%;
+  }
+  .avatar-wrap {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
   .introduction {
     height: 3.3em;
   }
@@ -10,6 +22,9 @@
   <view class="page">
     <view class="page__bd">
       <form bindsubmit="submit">
+        <view class="avator-warp">
+            <image class="avatar" src="{{ user.avator }}" @tap="updateAvatar"></image>
+        </view>
         <!-- 填写姓名 -->
         <view class="weui-cells__title">姓名</view>
         <view class="weui-cells weui-cells_after-title">
@@ -75,6 +90,8 @@
     data = {
       // 用户信息
       user: null,
+      //头像ID
+      avatarId: 0
       // 错误信息
       errors: null
     }
@@ -85,12 +102,22 @@
     }
     // 表单提交
     async submit (e) {
+    //每次提交都充值错误消息
       this.errors = null
       try {
+        //e.detail.value 为表单提交的数据
+        let formData = e.detail.value
+
+        //当avatarID被设置过之后则增加到avatar_image_id
+
+        if(this.avatarId !== 0) {
+            formData.avatar_image_id = this.avatarId
+        }
+
         let editResponse = await api.authRequest({
           url: 'user',
           method: 'PUT',
-          data: e.detail.value
+          data: formData
         })
 
         // 设置报错信息

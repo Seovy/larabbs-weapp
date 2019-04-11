@@ -6,7 +6,51 @@
 </head>
 <body>
 
+<style>
+
+</style>
 
 
+<script>
+    methods = {
+        async updateAvatar () {
+            //选择头像图片
+            let image = await wepy.chooseImage({count: 1})
+
+            try {
+                //获取选择的图片
+                let avator = image.tempFilePath[0]
+
+                //调用上传图片的接口
+
+                let imageResponse = await api.updateFile({
+                    url: 'iamge',
+                    method: 'POST',
+                    name: 'iamge',
+                    formData: {
+                        type: 'avatar'
+                    },
+                    filePath: avatar
+                })
+
+                //上传成功记录数据
+
+                if (imageResponse.statusCode === 201){
+                    //小程序上传结果没有做 JSON.parse,需要手动处理
+                    let responseData = JSON.parse(imageResponse.data)
+                    this.user.avatar = responseData.path
+                    this.avatarId = responseData.id
+                    this.$apply()
+                }
+            }catch (e) {
+                console.log(e)
+                wepy.showModal({
+                    title: '提示',
+                    content: '服务器错误，请联系管理员7'
+                })
+            }
+        }
+    }
+</script>
 </body>
 </html>
