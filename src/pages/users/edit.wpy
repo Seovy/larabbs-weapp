@@ -90,8 +90,8 @@
     data = {
       // 用户信息
       user: null,
-      //头像ID
-      avatarId: 0
+      // 头像ID
+      avatarId: 0,
       // 错误信息
       errors: null
     }
@@ -102,16 +102,16 @@
     }
     // 表单提交
     async submit (e) {
-    //每次提交都充值错误消息
+    // 每次提交都充值错误消息
       this.errors = null
       try {
-        //e.detail.value 为表单提交的数据
+        // e.detail.value 为表单提交的数据
         let formData = e.detail.value
 
-        //当avatarID被设置过之后则增加到avatar_image_id
+        // 当avatarID被设置过之后则增加到avatar_image_id
 
-        if(this.avatarId !== 0) {
-            formData.avatar_image_id = this.avatarId
+        if (this.avatarId !== 0) {
+          formData.avatar_image_id = this.avatarId
         }
 
         let editResponse = await api.authRequest({
