@@ -6,50 +6,41 @@
 </head>
 <body>
 
-<template>
-    <view class="page">
-        <view class="page__bd">
-            <topiclist :syncData.sync="requestData" :syncUrl.sync="requestUrl"></topiclist>
-        </view>
-    </view>
-
-</template>
 <script>
-    import wepy from 'wepy'
-    import topicList from '@/components/topicList'
+      import wepy from 'wepy'
+      import api from '@/utils/api'
+      import util from '@/utils/util' 
 
-    export default class UserIndex extends wepy.page{
-        config = {
-            navigationBarTitleText: 'Ta 发布的话题',
-            enablePullDownRefresh: true
-        }
-
+      export default class UserShow extends wepy.page {
         data = {
-            requestData: {},
-            requestUrl: null
+          // 用户数据
+          user: null
         }
+        async onLoad(options) {
+            try{
+                let userResponse = await api.request('users/' + options.id)
 
-        components = {
-            topiclist: topicList
-        }
+                if (userResponse.statusCode === 200) {
+                    //格式化注册时间
+                    this.user.created_at_diff = util.diffForHumans(this.user.created_at)
+                    // 格式化最后活跃时间
+                    this.user.last_actived_at_diff = util.diffForHumans(this.user.last_actived_at)
 
-        onLoad(options){
-            this.requestUrl = 'users/' + options.user_id + '/topics'
-            //组件数据改变，也需要调用 this.$apply()
-            this.$apply()
-            //调用组件 reload 方法
-            this.$invoke('topiclist','reload')
-        }
-        //下拉刷新
-        async onPullDOwnRefresh(){
-            //调用组件 reload 方法
-            await this.$invoke('topiclist','reload')
-            wepy.stopPullDownfresh()
-        }
-        //上拉加载更多
-        onReachBottom(){
-            //调用组件 loadMore 方法
-            this.$invoke('topiclist','loadMore')
+                    this.$apply()
+
+                    // 动态设置页面标题
+                    wepy.setNavigationBarTitle({
+                        title: this.user.name + ' 的主页'
+                    })
+                }
+
+            } catch (e) {
+                console.log(e)
+                wepy.showModal({
+                    title: '提示',
+                    content: '服务器错误，请联系管理员 '
+                })
+            }
         }
     }
 </script>
