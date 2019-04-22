@@ -70,7 +70,7 @@ page{
                   </repeat>
               </view>
               <view class="weui-panel__ft">
-                  <navigator class="weui-cell__bd weui-cell_access weui-cell_link" url="/pages/replies/index?topic_id={{ topic.id }}">
+                  <navigator class="weui-cell weui-cell_access weui-cell_link" url="/pages/replies/index?topic_id={{ topic.id }}">
                       <view class="weui-cell__bd">查看全部回复</view>
                       <view class="weui-cell__ft weui-cell_access"></view>
                   </navigator>
