@@ -15,6 +15,13 @@ page{
 .topic-title {
   padding: 15px;
 }
+.create-reply {
+  width: 40px;
+  height: 40px;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+}
 </style>
 <template>
     <view class="page">
@@ -45,10 +52,10 @@ page{
                 <rich-text nodes="{{ topic.body }}" bindtap="tap"></rich-text>
 
                 <button wx:if="{{ canDelete }}" @tap="deleteTopic" class="weui-btn mini-btn" type="default" size="mini">删除</button>
+
             </view>
 
-
-            <!-- 话题回复 -->
+          <!-- 话题回复 -->
           <view class="weui-panel weui-panel_access" wx:if="{{ topic.reply_count }}">
               <view class="weui-panel__hd">回复（{{ topic.reply_count }}）</view>
               <view class="weui-panel__bd">
@@ -69,6 +76,7 @@ page{
                       </view>
                   </repeat>
               </view>
+    
               <view class="weui-panel__ft">
                   <navigator class="weui-cell weui-cell_access weui-cell_link" url="/pages/replies/index?topic_id={{ topic.id }}">
                       <view class="weui-cell__bd">查看全部回复</view>
@@ -76,6 +84,10 @@ page{
                   </navigator>
               </view>
           </view>
+            <!-- 回复按钮 -->
+            <navigator url="/pages/replies/create?topic_id={{ topic.id }}">
+              <image  src="/images/reply.png" class="create-reply"/>
+            </navigator>
         </view>
     </view>
 </template>
@@ -151,6 +163,12 @@ page{
         this.$apply()
       }
 
+      async onShow() {
+        this.$parent.checkRefreshPages(this.getCurrentPages().pop().route, () => {
+          this.getTopic(this.topic.id)
+        })
+      }
+
       methods = {
         async deleteTopic() {
           // 确认删除
@@ -193,9 +211,6 @@ page{
                   refreshPages.push(page.route)
                 }
               })
-              console.log(233)
-              console.log(this.$parent.globalData.refreshPages)
-              console.log()
               this.$parent.globalData.refreshPages = this.$parent.globalData.refreshPages.concat(refreshPages)
               this.$apply()
             }

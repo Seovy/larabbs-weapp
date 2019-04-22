@@ -36,7 +36,7 @@
 </template>
 <script>
     import wepy from 'wepy'
-    import topicList from '@/mixins/replyMixin'
+    import replyMixin from '@/mixins/replyMixin'
 
     export default class replyUserIndex extends wepy.page {
       config = {
@@ -50,7 +50,6 @@
         requestData: {},
         requestUrl: 'user,topic'
       }
-
 
       async onLoad(options) {
         this.requestData.url = 'users/' + options.user_id + '/replies'

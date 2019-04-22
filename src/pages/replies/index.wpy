@@ -6,6 +6,13 @@
   width: 50px;
   height: 50px;
 }
+.create-reply {
+  width: 40px;
+  height: 40px;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+}
 </style>
 
 <template>
@@ -34,6 +41,10 @@
 			        </view>
 		        </view>
 		    </view>
+		    <!-- 回复链接 -->
+		    <navigator url="/pages/replies/create?topic_id={{ topicId }}">
+              <image  src="/images/reply.png" class="create-reply"/>
+            </navigator>
 		</view>
 	</view>
 </template>
@@ -60,9 +71,11 @@
         isLoading: false,
           // 当前页数
         page: 1,
+        requestData: {}
           // 话题 id
         topicId: 0
       }
+      mixins = [replyMixin]
         // 获取话题回复
       async getReplies(reset = false) {
         try {
@@ -104,9 +117,25 @@
       }
 
       async onLoad(options) {
-            // 获取url参数中的话题id
+      	this.$parent.checkRefreshPages(this.getCurrentPages().pop().route,()=>{
+      		this.noMoreData = false
+      		this.page = 1
+      		this.getReplies(true)
+      	})
+        // 获取url参数中的话题id
         this.topicId = options.topic_id
-        this.getReplies()
+        // 获取URL参数中的话题ID
+        this.requestData.url = 'topics/' + options.topic_id + '/replies'
+        this.getReplies(),
+
+      }
+
+      async onShow(){
+      	this.$parent.checkRefreshPages(this.getCurrentPages().pop().route,()=>{
+      	this.noMoreData = false
+      	this.page = 1
+      	this.getReplies(true)
+      	})
       }
 
       async onPullDownRefresh() {
