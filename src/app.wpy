@@ -187,18 +187,18 @@ export default class extends wepy.app {
     return perms
   }
 
-  //判断用户权限
+  // 判断用户权限
   can(targetPerm) {
-    if(!this.checkLogin()){
-        return false
+    if (!this.checkLogin()) {
+      return false
     }
 
-    //获取缓存中的权限
+    // 获取缓存中的权限
     let perms = wepy.getStorageSync('perms') || []
 
-    //判断权限中是否有目标权限
-    if(perms.find(perm => perm.name === targetPerm){
-        return true
+    // 判断权限中是否有目标权限
+    if (perms.find(perm => perm.name === targetPerm)) {
+      return true
     }
     return false
   }

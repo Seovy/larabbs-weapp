@@ -62,7 +62,7 @@ export default class ReplyMixin extends wepy.mixin {
     if (!user) {
       return false
     }
-    //用户为回复发布者 或 有管理内容权限
+    // 用户为回复发布者 或 有管理内容权限
     return (reply.user_id === user.id) || this.$parent.can('manage_contents')
   }
 
