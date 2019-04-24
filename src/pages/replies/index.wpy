@@ -13,6 +13,10 @@
   bottom: 30px;
   right: 30px;
 }
+.reply-delete {
+	width: 20px;
+	height: 20px;
+}
 </style>
 
 <template>
@@ -34,6 +38,7 @@
 		                            </view>
 		                        </view>
 		                    </view>
+		                    <image wx:if="{{ reply.can_delete }}" class="reply-delete" src="/images/trash.png" @tap="deleteReply({{ reply.topic_id }},{{ reply.id }})"></image>
 		                </view>
 		            </repeat>
 		            <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
@@ -64,6 +69,7 @@
       requestData: {}
     }
     mixins = [replyMixin]
+
     async onLoad(options) {
       // 获取 URL 参数中的 话题id
       this.requestData.url = 'topics/' + options.topic_id + '/replies'

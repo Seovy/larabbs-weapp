@@ -26,13 +26,16 @@ export default class ReplyMixin extends wepy.mixin {
         }
       })
 
-      if (repliesResponse.statusCode === 200) {
-        let replies = repliesResponse.data.data()
+        if (repliesResponse.statusCode === 200) {
+            let replies = repliesResponse.data.data
 
-                // 格式化回复创建时间
-        replies.forEach(function (reply) {
-          reply.created_at_diff = util.diffForHumans(reply.created_at)
-        })
+            // 获取当前用户
+            let user = await this.$parent.getCurrentUser()
+            replies.forEach((reply) => {
+                // 控制是否可以删除
+                reply.can_delete = this.canDelete(user, reply)
+                reply.created_at_diff = util.diffForHumans(reply.created_at)
+            })
 
                 // 如果reset不为true则合并this.replies; 否则直接覆盖
         this.replies = reset ? replies : this.replies.concat(replies)
@@ -55,6 +58,13 @@ export default class ReplyMixin extends wepy.mixin {
     }
   }
 
+    canDelete(user,reply){
+    if(!user){
+      return false
+    }
+    return (reply.user_id === user.id)
+  }
+
   async onPullDownRefresh() {
     this.noMoreData = false
     this.page = 1
@@ -75,10 +85,47 @@ export default class ReplyMixin extends wepy.mixin {
     this.$apply()
   }
   methods = {
-    tap () {
-      this.mixin = 'mixin data was changed'
-      console.log('mixin metho d tap')
-    }
+    //删除回复
+      async deleteReply(topicId,replyId){
+        //确认是否删除
+          let res = await wepy.showModal({
+              title: '确认删除',
+              content: '您确定删除该回复吗',
+              confirmText: '删除',
+              cancelText: '取消'
+          })
+
+          //点击取消后返回
+          if(!res.confirm){
+            return
+          }
+          try{
+            //调用接口删除回复
+              let deleteResponse = await api.authRequest({
+                  url: 'topics/' + topicId + '/replies/' + replyId,
+                  method: 'DELETE'
+              })
+              //删除成功
+              if (deleteResponse.statusCode === 204){
+                wepy.showToast({
+                    title: '删除成功',
+                    icon: 'success',
+                    duration: 2000
+                })
+                  //将删除了的回复移除
+                  this.replies = this.replies.filter((reply) => reply.id !==replyId)
+                  this.$apply()
+              }
+
+              return deleteResponse
+          }catch(e){
+            console.log(e)
+              wepy.showModal({
+                  title: '提示',
+                  content: '服务器错误，请联系管理员'
+              })
+          }
+      }
   }
 
   onShow() {
