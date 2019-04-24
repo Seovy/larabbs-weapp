@@ -50,7 +50,8 @@ export default class extends wepy.app {
       'pages/auth/register',
       'pages/replies/index',
       'pages/replies/userIndex',
-      'pages/replies/create'
+      'pages/replies/create',
+      'pages/notifications/index'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -99,11 +100,11 @@ export default class extends wepy.app {
 
   onLaunch() {
   // 小程序启动，调用一起获取未读消息数
-  this.updateUnreadCount()
-  //每隔60秒，调用一起获取未读消息数
-  setInterval(() => {
     this.updateUnreadCount()
-  },6000)
+  // 每隔60秒，调用一起获取未读消息数
+    setInterval(() => {
+      this.updateUnreadCount()
+    }, 6000)
     wepy.login().then(res => {
       console.log('login: ', res)
     })
@@ -111,18 +112,18 @@ export default class extends wepy.app {
     console.log(wx.getSystemInfo())
   }
 
-  //获取未读消息数
-  async updateUnreadCount(){
-    //未登录不需要请求
-    if(!this.checkLogin()){
-    return 
+  // 获取未读消息数
+  async updateUnreadCount() {
+    // 未登录不需要请求
+    if (!this.checkLogin()) {
+      return
     }
 
-    //请求消息统计接口
+    // 请求消息统计接口
     let notificationResponse = await api.authRequest('user/notifications/stats', false)
 
-    //请求成功，赋值全局变量 unreadCount
-    if(notificationResponse.statusCode === 200){
+    // 请求成功，赋值全局变量 unreadCount
+    if (notificationResponse.statusCode === 200) {
       this.globalData.unreadCount = notificationResponse.data.unread_count
     }
   }

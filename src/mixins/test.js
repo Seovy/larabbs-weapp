@@ -19,5 +19,3 @@ export default class testMixin extends wepy.mixin {
     console.log('mixin onLoad')
   }
 }
-
-
