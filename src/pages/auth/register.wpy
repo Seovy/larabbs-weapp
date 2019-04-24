@@ -233,6 +233,8 @@
 
         // 记录 key 和过期时间，打开 modal
         if (captchaResponse.statusCode === 201) {
+        // 获取用户权限
+          this.$parent.getPerms()
           this.captcha = {
             key: captchaResponse.data.captcha_key,
             imageContent: captchaResponse.data.captcha_image_content,
